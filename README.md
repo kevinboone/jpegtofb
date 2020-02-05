@@ -161,10 +161,10 @@ Undoutedly there are some. Please report bugs through GitHub.
 
 ## Version history
 
-1.0a Feb 2020 
-First working version
+1.0a Feb 2020 <br/>
+First working version<br/>
 
-1.0b Feb 2020 
-Added options to control screen fitting  
-Added --exec option  
+1.0b Feb 2020<br/> 
+Added options to control screen fitting<br/> 
+Added --exec option<br/>   
 
