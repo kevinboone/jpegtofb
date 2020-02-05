@@ -1,6 +1,6 @@
 # jpegtofb
 
-Version 0.1a
+Version 0.1b
 
 ## What is this?
 
@@ -51,6 +51,14 @@ will be displayed for a selectable time.
 
 Specify the framebuffer device. The default is `/dev/fb0`.
 
+`-f,--fit-width`
+
+Scale the image so that it fits the width or the framebuffer
+rather than the height, which is the default. This will nearly
+always fill the screen, if the images are photos. However,
+a significant amount of the top and bottom of the image might
+be cut off.
+
 `-l,--landscape`
 
 Include only landscape-format images in slideshow mode.
@@ -75,7 +83,12 @@ mode.
 
 Write messages to the system log. 
 
+`-x,--exec=cmd`
 
+Executes the shell command after changing the image, in slideshow
+mode. The purpose of this option is to allow this utility to
+broadcast a signal (e.g., using 'killall') to other programs that
+may need to redraw after the background has changed.
 
 ## Notes 
 
@@ -93,6 +106,11 @@ on the framebuffer.
 
 In slideshow mode, you can send a `USR1` signal to skip the
 wait, and go straight to the next picture.
+
+`jpegtofb` will not change the aspect ratio of an image, which is
+very ugly. It either fits the image to the width of the framebuffer,
+or the height. There is no foolproof way to figure out in 
+advance which method will be best -- it depends on the images.
 
 ## Limitations
 
@@ -115,6 +133,14 @@ Early Raspberry Pi systems and units of similar specification
 similar might struggle to find enough memory to handle really large
 images. 
 
+The scaling process this utility uses is crude, but fast. It does
+not interpolate -- it just picks a sampling of pixels from the source
+image and puts them on the display. In practice, this seems to
+produce reasonable results on the kinds of screens embedded devices
+are likely to have. It would not be difficult to implement
+proper interpolation, but it would be very slow on the kind of
+hardware `jpegtofb` is designed for.
+
 ## Legal, etc 
 
 `jpegtofb` is copyright (c)2020 Kevin Boone, and distributed under
@@ -132,4 +158,13 @@ There is no warranty of any kind.
 ## Bugs
 
 Undoutedly there are some. Please report bugs through GitHub.
+
+## Version history
+
+1.0a Feb 2020 
+First working version
+
+1.0b Feb 2020 
+Added options to control screen fitting  
+Added --exec option  
 

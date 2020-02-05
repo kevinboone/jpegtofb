@@ -13,7 +13,7 @@
 BEGIN_DECLS
 
 void jpegtofb_putonfb (const char *fbdev, const char *filename, 
-        char **error);
+        BOOL fit_to_width, char **error);
 
 END_DECLS
 

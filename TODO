@@ -1,16 +1,14 @@
+Write man page
+
 Remove default error handling in libjpeg (necessity reduced as I have
 implemented pre-load checks to reduce the likelihood of passing a broken JPEG
 to libjpeg)
 
 Improve the interpolation when scaling. And by "improve" I really mean
-"implement"
-
-If the source image and framebuffer dimensions have have the same exact size,
-skip the scaling phase altogether, and save memory.
-
-Fit width as well as height
+"implement". Doing this in a way that can handle large images on
+Raspberry Pi-type hardware, without taking a week, will be non-trivial
 
 Recurse directories?
 
-Fade/crossfade between images
+Consider adding transition effects between images
 

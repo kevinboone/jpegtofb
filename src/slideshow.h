@@ -16,7 +16,7 @@ typedef struct _Slideshow Slideshow;
 
 BEGIN_DECLS
 
-Slideshow  *slideshow_create (const char *fbdev);
+Slideshow  *slideshow_create (const char *fbdev, BOOL fit_to_width);
 void        slideshow_destroy (Slideshow *self);
 void        slideshow_add_picture (Slideshow *self, const char *filename);
 void        slideshow_show_and_increment (Slideshow *self, char **error);

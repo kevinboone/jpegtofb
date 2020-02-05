@@ -68,7 +68,8 @@ BOOL program_next_picture (void)
 ==========================================================================*/
 void program_signal_usr1 (int dummy)
   {
-  program_next_picture ();
+  // NO need to do anything -- the interrupt just kills
+  //  the sleep() call in the slideshow loop
   }
 
 
@@ -141,11 +142,13 @@ int program_run (ProgramContext *context)
     const char *fbdev = "/dev/fb0";
     const char *arg_fbdev = program_context_get (context, "fbdev");
     if (arg_fbdev) fbdev = arg_fbdev;
+    BOOL fit_to_width = program_context_get_boolean (context, 
+             "fit-width", FALSE);
 
     if (argc == 2)
       {
       char *error = NULL;
-      jpegtofb_putonfb (fbdev, filename, &error);
+      jpegtofb_putonfb (fbdev, filename, fit_to_width, &error);
       if (error)
         {
         log_error (error);
@@ -159,7 +162,7 @@ int program_run (ProgramContext *context)
       log_debug ("Slideshow mode");
       // We are in slideshow mode, with potentially multiple
       //   pictures
-      slideshow = slideshow_create (fbdev);
+      slideshow = slideshow_create (fbdev, fit_to_width);
 
       for (int i = 1; i < argc; i++)
         {
@@ -191,7 +194,9 @@ int program_run (ProgramContext *context)
         while (TRUE)
           {
           program_next_picture ();
-          sleep (seconds); // TODO
+          const char *exec = program_context_get (context, "exec");
+          if (exec) system (exec);
+          sleep (seconds); 
           }
         }
       else

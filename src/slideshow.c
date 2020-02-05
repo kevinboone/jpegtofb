@@ -32,6 +32,7 @@ struct _Slideshow
   char *fbdev;
   List *list;
   int index;
+  BOOL fit_to_width;
   }; 
 
 
@@ -40,13 +41,14 @@ struct _Slideshow
   slideshow_create
 
 *==========================================================================*/
-Slideshow *slideshow_create (const char *fbdev)
+Slideshow *slideshow_create (const char *fbdev, BOOL fit_to_width)
   {
   LOG_IN
   Slideshow *self = malloc (sizeof (Slideshow));
   self->fbdev = strdup (fbdev);
   self->list = list_create ((ListItemFreeFn)free);
   self->index = 0;
+  self->fit_to_width = fit_to_width;
   LOG_OUT
   return self;
   }
@@ -105,7 +107,7 @@ void slideshow_show_and_increment (Slideshow *self, char **error)
   log_debug ("show_and_increment l=%d, index=%d, file=%s",
          l, self->index, filename);
 
-  jpegtofb_putonfb (self->fbdev, filename, error);
+  jpegtofb_putonfb (self->fbdev, filename, self->fit_to_width, error);
 
   self->index++;
   if (self->index == l)

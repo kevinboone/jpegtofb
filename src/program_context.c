@@ -115,10 +115,12 @@ BOOL program_context_parse_command_line (ProgramContext *self,
       {"help", no_argument, NULL, 'h'},
       {"version", no_argument, NULL, 'v'},
       {"log-level", required_argument, NULL, 0},
+      {"fit-width", no_argument, NULL, 'f'},
       {"syslog", no_argument, NULL, 0},
       {"width", required_argument, NULL, 'w'},
       {"fbdev", required_argument, NULL, 'd'},
       {"sleep", required_argument, NULL, 's'},
+      {"exec", required_argument, NULL, 'x'},
       {"landscape", no_argument, NULL, 'l'},
       {"randomize", no_argument, NULL, 'r'},
       {0, 0, 0, 0}
@@ -128,7 +130,7 @@ BOOL program_context_parse_command_line (ProgramContext *self,
    while (ret)
      {
      int option_index = 0;
-     opt = getopt_long (argc, argv, "hvlw:d:s:r",
+     opt = getopt_long (argc, argv, "hvlw:d:s:rfx:",
      long_options, &option_index);
 
      if (opt == -1) break;
@@ -138,6 +140,8 @@ BOOL program_context_parse_command_line (ProgramContext *self,
        case 0:
          if (strcmp (long_options[option_index].name, "help") == 0)
            program_context_put_boolean (self, "show-usage", TRUE);
+         else if (strcmp (long_options[option_index].name, "fit-width") == 0)
+           program_context_put_boolean (self, "fit-width", TRUE);
          else if (strcmp (long_options[option_index].name, "landscape") == 0)
            program_context_put_boolean (self, "landscape", TRUE);
          else if (strcmp (long_options[option_index].name, "syslog") == 0)
@@ -152,6 +156,8 @@ BOOL program_context_parse_command_line (ProgramContext *self,
            program_context_put_integer (self, "width", atoi (optarg)); 
          else if (strcmp (long_options[option_index].name, "sleep") == 0)
            program_context_put_integer (self, "sleep", atoi (optarg)); 
+         else if (strcmp (long_options[option_index].name, "exec") == 0)
+           program_context_put (self, "exec", optarg); 
          else if (strcmp (long_options[option_index].name, "fbdev") == 0)
            program_context_put (self, "fbdev", optarg); 
          else
@@ -161,6 +167,8 @@ BOOL program_context_parse_command_line (ProgramContext *self,
          program_context_put_boolean (self, "show-usage", TRUE); break;
        case 'v': 
          program_context_put_boolean (self, "show-version", TRUE); break;
+       case 'f': 
+         program_context_put_boolean (self, "fit-width", TRUE); break;
        case 'l': 
          program_context_put_boolean (self, "landscape", TRUE); break;
        case 'r': 
@@ -170,6 +178,7 @@ BOOL program_context_parse_command_line (ProgramContext *self,
        case 's': program_context_put_integer (self, "sleep", 
            atoi (optarg)); break;
        case 'd': program_context_put (self, "fbdev", optarg); break;
+       case 'x': program_context_put (self, "exec", optarg); break;
        default:
          ret = FALSE; 
        }

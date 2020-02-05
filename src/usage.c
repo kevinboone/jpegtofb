@@ -23,6 +23,7 @@ void usage_show (FILE *fout, const char *argv0)
   {
   fprintf (fout, "Usage: %s [options] {images}\n", argv0);
   fprintf (fout, "  -d,--fbdev=device    framebuffer device\n");
+  fprintf (fout, "  -f,--fit-width       fit image to display width, not height\n");
   fprintf (fout, "  -h,--help            show this message\n");
   fprintf (fout, "  -l,--landscape       only include landscape format in slideshow\n");
   fprintf (fout, "  -r,--randomize       randomize slideshow order\n");
@@ -31,6 +32,7 @@ void usage_show (FILE *fout, const char *argv0)
   fprintf (fout, "     --syslog          messages to system log\n");
   fprintf (fout, "  -v,--version         show version\n");
   fprintf (fout, "  -w,--width=N         set text output width; 0=no format\n");
+  fprintf (fout, "  -x,--exec=cmd        execute command after showing image\n");
   }
 
  

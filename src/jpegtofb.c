@@ -41,22 +41,32 @@ static void transform (char *in, int in_height, int in_width, char *out,
     int out_height, int out_width)
   {
   LOG_IN
-  double scale = (double)in_width / (double)out_width;
-  log_debug ("transform: scale=%f", scale);
-  for (int i = 0; i < out_height; i++)
+  if (in_height == out_height && in_width == out_width)
     {
-    int new_y = i * scale;
-    for (int j = 0; j < out_width; j++)
+    // No need to scale -- just copy the input to the 
+    //   output
+    int size = in_width * in_height * 3;
+    memcpy (out, in, size);
+    }
+  else
+    {
+    double scale = (double)in_width / (double)out_width;
+    log_debug ("transform: scale=%f", scale);
+    for (int i = 0; i < out_height; i++)
       {
-      int new_x = j * scale; 
-      int index24in = (new_y * in_width + new_x) * 3;
-      int index24out = (i * out_width + j) * 3;
-      char r = in[index24in + 0];
-      char g = in[index24in + 1];
-      char b = in[index24in + 2];
-      out[index24out + 0] = r;
-      out[index24out + 1] = g;
-      out[index24out + 2] = b;
+      int new_y = i * scale;
+      for (int j = 0; j < out_width; j++)
+        {
+        int new_x = j * scale; 
+        int index24in = (new_y * in_width + new_x) * 3;
+        int index24out = (i * out_width + j) * 3;
+        char r = in[index24in + 0];
+        char g = in[index24in + 1];
+        char b = in[index24in + 2];
+        out[index24out + 0] = r;
+        out[index24out + 1] = g;
+        out[index24out + 2] = b;
+        }
       }
     }
   LOG_OUT
@@ -70,7 +80,7 @@ static void transform (char *in, int in_height, int in_width, char *out,
 
 ==========================================================================*/
 void jpegtofb_putonfb (const char *fbdev, const char *filename, 
-     char **error)
+     BOOL fit_to_width, char **error)
   {
   LOG_IN
   *error = NULL;  
@@ -102,11 +112,19 @@ void jpegtofb_putonfb (const char *fbdev, const char *filename,
       int fb_bytes = fb_bpp / 8;
 
       double aspect = (double)jpeg_width / (double) jpeg_height;
+  
+      int fit_width, fit_height;
+      if (fit_to_width)
+        {
+        fit_width = fb_width;
+        fit_height = fit_width / aspect;
+        }
+      else
+        {
+        fit_height = fb_height;
+        fit_width = (int) fit_height * aspect;
+        }
 
-      // Fit height -- TODO
-      int fit_height = fb_height;
-      int fit_width = (int) fit_height * aspect;
-      
       char *out_24bpp = malloc (fit_height * fit_width * 3);
       transform (bmp_buffer, jpeg_height, jpeg_width, 
         out_24bpp, fit_height, fit_width);
@@ -116,7 +134,7 @@ void jpegtofb_putonfb (const char *fbdev, const char *filename,
       char *fbdata = mmap (0, fb_data_size, 
 	     PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, (off_t)0);
 
-      memset (fbdata, 0, fb_data_size);
+      memset (fbdata, 0, fb_data_size); 
 
       // xoff is the number of pixels between the left edge of the photo,
       //   and the left edge of the screen. 
