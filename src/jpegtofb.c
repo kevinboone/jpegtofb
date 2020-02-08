@@ -98,10 +98,14 @@ void jpegtofb_putonfb (const char *fbdev, const char *filename,
     int fbfd = open (fbdev, O_RDWR);
     if (fbfd >= 0)
       {
+      struct fb_fix_screeninfo finfo;
       struct fb_var_screeninfo vinfo;
 
+      ioctl (fbfd, FBIOGET_FSCREENINFO, &finfo);
       ioctl (fbfd, FBIOGET_VSCREENINFO, &vinfo);
 
+      log_debug ("putonfb: smem_len %d", finfo.smem_len);
+      log_debug ("putonfb: line_len %d", finfo.line_length);
       log_debug ("putonfb: xres %d", vinfo.xres); 
       log_debug ("putonfb: yres %d", vinfo.yres); 
       log_debug ("putonfb: bpp %d", vinfo.bits_per_pixel); 
@@ -130,6 +134,7 @@ void jpegtofb_putonfb (const char *fbdev, const char *filename,
         out_24bpp, fit_height, fit_width);
 
       int fb_data_size = fb_width * fb_height * fb_bytes;
+      log_debug ("putonfb: data_size %d", fb_data_size);
 
       char *fbdata = mmap (0, fb_data_size, 
 	     PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, (off_t)0);
@@ -146,6 +151,11 @@ void jpegtofb_putonfb (const char *fbdev, const char *filename,
       int x_off = (fb_width - fit_width) / 2;
 
       int y_off = (fb_height - fit_height) / 2;
+
+#define max(a, b) ((a) > (b) ? (a) : (b))
+      int stride = max(finfo.line_length, fb_width * fb_bytes);
+      int slop = stride - (fb_width * fb_bytes);
+
       for (int i = 0; i < fb_height; i++)
 	{
         int y24 = i - y_off;
@@ -159,7 +169,10 @@ void jpegtofb_putonfb (const char *fbdev, const char *filename,
             if (x32 > 0 && x32 < fb_width && x24 > 0 && x24 < fit_width)
               {
 	      int index24 = (y24 * fit_width + x24) * 3;
-	      int index32 = (y32 * fb_width + x32) * 4;
+	      int index32 = ((y32 * fb_width + x32) * fb_bytes) + (y32 * slop);
+              /* only ~`fb_data_size' is writable, even if `smem_len' is bigger */
+              if (index32 > fb_data_size)
+                 break;
 	      char r = out_24bpp [index24 + 0];
 	      char g = out_24bpp [index24 + 1];
 	      char b = out_24bpp [index24 + 2];
@@ -167,7 +180,8 @@ void jpegtofb_putonfb (const char *fbdev, const char *filename,
 	      fbdata [index32 + 0] = b;
 	      fbdata [index32 + 1] = g;
 	      fbdata [index32 + 2] = r;
-	      fbdata [index32 + 3] = a;
+              if (vinfo.transp.length == 8)
+	        fbdata [index32 + 3] = a;
               }
             }
 	  }
