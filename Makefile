@@ -1,5 +1,5 @@
 NAME    :=  jpegtofb
-VERSION :=  0.1b
+VERSION :=  0.1c
 CC      :=  gcc 
 #LIBS    := -l:libjpeg.so.62 ${EXTRA_LIBS} 
 LIBS    := ${EXTRA_LIBS} 

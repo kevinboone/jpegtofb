@@ -166,5 +166,12 @@ First working version<br/>
 
 1.0b Feb 2020<br/> 
 Added options to control screen fitting<br/> 
-Added --exec option<br/>   
+Added --exec option<br/> 
+
+1.0c Feb 2020<br/> 
+Added code to allow for framebuffers with stride != 
+width * bytes\_per\_pixel (thanks [rajeevvp])<br/>
+Optimized arithmetic in the framebuffer byte transfer (and made
+it even more unreadable ;) )<br/>
+
 

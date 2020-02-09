@@ -23,6 +23,7 @@
 #include "jpegreader.h" 
 #include "jpegtofb.h" 
 
+#define max(a, b) ((a) > (b) ? (a) : (b))
 
 /*==========================================================================
 
@@ -152,39 +153,42 @@ void jpegtofb_putonfb (const char *fbdev, const char *filename,
 
       int y_off = (fb_height - fit_height) / 2;
 
-#define max(a, b) ((a) > (b) ? (a) : (b))
-      int stride = max(finfo.line_length, fb_width * fb_bytes);
+      int stride = max (finfo.line_length, fb_width * fb_bytes);
       int slop = stride - (fb_width * fb_bytes);
+      int transp_len = vinfo.transp.length; 
 
+      int y24 = -y_off;
       for (int i = 0; i < fb_height; i++)
 	{
-        int y24 = i - y_off;
         int y32 = i;
         if (y32 >= 0 && y32 < fb_height)
           {
+          int y_times_slop = y32 * slop;
+          int x24 = -x_off;
 	  for (int j = 0; j < fb_width; j++)
 	    {
-            int x24 = j - x_off;
             int x32 = j;
             if (x32 > 0 && x32 < fb_width && x24 > 0 && x24 < fit_width)
               {
 	      int index24 = (y24 * fit_width + x24) * 3;
-	      int index32 = ((y32 * fb_width + x32) * fb_bytes) + (y32 * slop);
-              /* only ~`fb_data_size' is writable, even if `smem_len' is bigger */
+	      int index32 = ((y32 * fb_width + x32) * fb_bytes) + y_times_slop;
+              /* only ~`fb_data_size' is writable, 
+                   even if `smem_len' is bigger */
               if (index32 > fb_data_size)
                  break;
-	      char r = out_24bpp [index24 + 0];
-	      char g = out_24bpp [index24 + 1];
-	      char b = out_24bpp [index24 + 2];
-	      char a = 0xFF;
-	      fbdata [index32 + 0] = b;
-	      fbdata [index32 + 1] = g;
-	      fbdata [index32 + 2] = r;
-              if (vinfo.transp.length == 8)
-	        fbdata [index32 + 3] = a;
+	      char r = out_24bpp [index24++];
+	      char g = out_24bpp [index24++];
+	      char b = out_24bpp [index24];
+	      fbdata [index32++] = b;
+	      fbdata [index32++] = g;
+	      fbdata [index32++] = r;
+              if (transp_len == 8)
+	        fbdata [index32] = 0xFF;
               }
+            x24++;
             }
 	  }
+        y24++;
         }
       munmap (fbdata, fb_data_size);
       free (out_24bpp);
