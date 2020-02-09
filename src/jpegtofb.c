@@ -174,7 +174,7 @@ void jpegtofb_putonfb (const char *fbdev, const char *filename,
 	      int index32 = ((y32 * fb_width + x32) * fb_bytes) + y_times_slop;
               /* only ~`fb_data_size' is writable, 
                    even if `smem_len' is bigger */
-              if (index32 > fb_data_size)
+              if (index32 >= fb_data_size)
                  break;
 	      char r = out_24bpp [index24++];
 	      char g = out_24bpp [index24++];
