@@ -23,7 +23,6 @@
 #include "jpegreader.h" 
 #include "jpegtofb.h" 
 
-#define max(a, b) ((a) > (b) ? (a) : (b))
 
 /*==========================================================================
 
@@ -153,8 +152,7 @@ void jpegtofb_putonfb (const char *fbdev, const char *filename,
 
       int y_off = (fb_height - fit_height) / 2;
 
-      int stride = max (finfo.line_length, fb_width * fb_bytes);
-      int slop = stride - (fb_width * fb_bytes);
+      int stride = finfo.line_length;	/* stride may be in bytes, not pixels */
       int transp_len = vinfo.transp.length; 
 
       int y24 = -y_off;
@@ -163,7 +161,6 @@ void jpegtofb_putonfb (const char *fbdev, const char *filename,
         int y32 = i;
         if (y32 >= 0 && y32 < fb_height)
           {
-          int y_times_slop = y32 * slop;
           int x24 = -x_off;
 	  for (int j = 0; j < fb_width; j++)
 	    {
@@ -171,7 +168,7 @@ void jpegtofb_putonfb (const char *fbdev, const char *filename,
             if (x32 > 0 && x32 < fb_width && x24 > 0 && x24 < fit_width)
               {
 	      int index24 = (y24 * fit_width + x24) * 3;
-	      int index32 = ((y32 * fb_width + x32) * fb_bytes) + y_times_slop;
+	      int index32 = (y32 * stride) + (x32 * fb_bytes);
               /* only ~`fb_data_size' is writable, 
                    even if `smem_len' is bigger */
               if (index32 >= fb_data_size)
