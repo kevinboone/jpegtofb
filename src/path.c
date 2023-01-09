@@ -298,7 +298,7 @@ void path_remove_directory (Path *self)
     {
     // Assume there is no filename -- leave an empty path
     free (self->str);
-    self->str = malloc (1);
+    self->str = malloc (1 * sizeof (UTF32));
     self->str[0] = 0;
     }
   else
