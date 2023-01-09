@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include <stdint.h>
 #include "defs.h"
 #include "list.h"
 

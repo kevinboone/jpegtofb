@@ -7,7 +7,7 @@ Distributed under the terms of the GPL v3.0
 
 #pragma once
 
-#include <stdint.h>
+#include "defs.h"
 #include "list.h" 
 #include "buffer.h" 
 #include "string.h" 

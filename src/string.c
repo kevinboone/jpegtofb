@@ -20,7 +20,6 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <pthread.h>
-#include <stdint.h>
 #include <stdarg.h>
 #include <errno.h>
 #include <sys/types.h>
