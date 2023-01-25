@@ -15,7 +15,6 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <pthread.h>
-#include <stdint.h>
 #include <stdarg.h>
 #include <errno.h>
 #include <sys/types.h>
@@ -299,7 +298,7 @@ void path_remove_directory (Path *self)
     {
     // Assume there is no filename -- leave an empty path
     free (self->str);
-    self->str = malloc (1);
+    self->str = malloc (1 * sizeof (UTF32));
     self->str[0] = 0;
     }
   else
