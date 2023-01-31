@@ -238,7 +238,7 @@ char *numberformat_space_64 (int64_t n, const char *sep)
     char in[30];
     ret = malloc (40);
     ret[0] = 0;
-    sprintf (in, "%ld", n);
+    sprintf (in, "%lld", n);
     int lin = strlen (in);
 
     int before = (lin % 3);
